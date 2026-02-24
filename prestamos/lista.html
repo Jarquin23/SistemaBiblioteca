@@ -1,0 +1,80 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Préstamos{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>🔁 Gestión de Préstamos</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
+        ➕ Nuevo Préstamo
+    </button>
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Estudiante</th>
+            <th>Libro</th>
+            <th>Fecha Préstamo</th>
+            <th>Fecha Devolución</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in prestamos %}
+        <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.estudiante }}</td>
+            <td>{{ p.libro }}</td>
+            <td>{{ p.fecha_prestamo }}</td>
+            <td>{{ p.fecha_devolucion|default:"-" }}</td>
+            <td>
+                {% if p.devuelto %}
+                    <span class="badge bg-success">Devuelto</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Prestado</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if not p.devuelto %}
+                <a href="{% url 'devolver_libro' p.id %}" class="btn btn-sm btn-success">
+                    ✔ Devolver
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="text-center">No hay préstamos registrados</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- MODAL CREAR -->
+<div class="modal fade" id="modalCrear" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{% url 'crear_prestamo' %}" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">➕ Nuevo Préstamo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                {{ form.as_p }}
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Estudiantes{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>👨‍🎓 Gestión de Estudiantes</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
+        ➕ Nuevo Estudiante
+    </button>
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Carnet</th>
+            <th>Correo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in estudiantes %}
+        <tr>
+            <td>{{ e.id }}</td>
+            <td>{{ e.nombre }}</td>
+            <td>{{ e.apellido }}</td>
+            <td>{{ e.carnet }}</td>
+            <td>{{ e.correo }}</td>
+            <td>
+                <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditar{{ e.id }}">
+                    ✏️
+                </button>
+
+                <a href="{% url 'eliminar_estudiante' e.id %}" class="btn btn-sm btn-danger"
+                   onclick="return confirm('¿Desea eliminar este estudiante?')">
+                    🗑️
+                </a>
+            </td>
+        </tr>
+
+        <!-- MODAL EDITAR -->
+        <div class="modal fade" id="modalEditar{{ e.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <form method="POST" action="{% url 'editar_estudiante' e.id %}" class="modal-content">
+                    {% csrf_token %}
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">✏️ Editar Estudiante</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <input type="text" name="nombre" value="{{ e.nombre }}" class="form-control mb-2" required>
+                        <input type="text" name="apellido" value="{{ e.apellido }}" class="form-control mb-2" required>
+                        <input type="text" name="carnet" value="{{ e.carnet }}" class="form-control mb-2" required>
+                        <input type="email" name="correo" value="{{ e.correo }}" class="form-control mb-2" required>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button class="btn btn-warning">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">No hay estudiantes registrados</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- MODAL CREAR -->
+<div class="modal fade" id="modalCrear" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{% url 'crear_estudiante' %}" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">➕ Nuevo Estudiante</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                {{ form.as_p }}
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
